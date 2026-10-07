@@ -1,11 +1,11 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { Toaster } from "@/components/ui/sonner";
 import { ApiError } from "@/lib/api/client";
-import { makeStore, type AppStore } from "@/store";
+import { type AppStore, makeStore } from "@/store";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -15,7 +15,11 @@ function makeQueryClient() {
         refetchOnWindowFocus: false,
         retry: (failureCount, error) => {
           // Never retry client errors (4xx) — they won't succeed on retry.
-          if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+          if (
+            error instanceof ApiError &&
+            error.status >= 400 &&
+            error.status < 500
+          ) {
             return false;
           }
           return failureCount < 2;

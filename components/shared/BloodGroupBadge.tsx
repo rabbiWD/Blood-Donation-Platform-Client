@@ -27,6 +27,7 @@ export function BloodGroupBadge({
         SIZES[size],
         className,
       )}
+      role="img"
       aria-label={`Blood group ${BLOOD_GROUP_LABELS[group]}`}
     >
       <Droplet className="size-[1em] fill-current" aria-hidden />

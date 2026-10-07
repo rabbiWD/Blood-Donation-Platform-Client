@@ -30,7 +30,9 @@ interface IRequestOptions extends Omit<RequestInit, "body"> {
 }
 
 function buildUrl(path: string, params?: QueryParams): string {
-  const url = new URL(`${env.API_URL}${path.startsWith("/") ? path : `/${path}`}`);
+  const url = new URL(
+    `${env.API_URL}${path.startsWith("/") ? path : `/${path}`}`,
+  );
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined && value !== null && value !== "") {
@@ -55,7 +57,8 @@ export async function request<T>(
   path: string,
   { params, body, headers, ...init }: IRequestOptions = {},
 ): Promise<IApiResponse<T>> {
-  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  const isFormData =
+    typeof FormData !== "undefined" && body instanceof FormData;
 
   let response: Response;
   try {

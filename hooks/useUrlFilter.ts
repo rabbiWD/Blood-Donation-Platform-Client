@@ -32,7 +32,12 @@ export function useUrlFilter() {
       const params = new URLSearchParams(searchParams.toString());
 
       for (const [key, value] of Object.entries(updates)) {
-        if (value === null || value === undefined || value === "" || value === "ALL") {
+        if (
+          value === null ||
+          value === undefined ||
+          value === "" ||
+          value === "ALL"
+        ) {
           params.delete(key);
         } else {
           params.set(key, String(value));

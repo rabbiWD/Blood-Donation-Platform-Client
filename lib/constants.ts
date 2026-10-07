@@ -1,8 +1,4 @@
-import type {
-  BloodGroup,
-  RequestStatus,
-  UrgencyLevel,
-} from "@/types";
+import type { BloodGroup, RequestStatus, UrgencyLevel } from "@/types";
 
 export const BLOOD_GROUP_LABELS: Record<BloodGroup, string> = {
   A_POSITIVE: "A+",
@@ -22,8 +18,7 @@ export const URGENCY_LABELS: Record<UrgencyLevel, string> = {
 };
 
 export const URGENCY_STYLES: Record<UrgencyLevel, string> = {
-  CRITICAL:
-    "bg-red-600 text-white border-red-600 shadow-sm shadow-red-600/30",
+  CRITICAL: "bg-red-600 text-white border-red-600 shadow-sm shadow-red-600/30",
   HIGH: "bg-orange-100 text-orange-800 border-orange-300",
   STANDARD: "bg-emerald-100 text-emerald-800 border-emerald-300",
 };
