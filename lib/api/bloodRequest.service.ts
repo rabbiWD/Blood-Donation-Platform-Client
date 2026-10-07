@@ -52,10 +52,28 @@ export const bloodRequestService = {
     return res.data || [];
   },
 
-  respondToRequest: async (requestId: string): Promise<IDonorAssignment> => {
+  getCompatibleRequests: async (): Promise<IBloodRequest[]> => {
+    const res = await api.get<IBloodRequest[]>(
+      "/blood-requests/compatible-requests",
+    );
+    return res.data || [];
+  },
+
+  acceptRequest: async (requestId: string): Promise<IDonorAssignment> => {
     const res = await api.post<IDonorAssignment>(
-      `/blood-requests/${requestId}/respond`,
+      `/blood-requests/${requestId}/accept`,
     );
     return res.data;
+  },
+
+  completeDonation: async (requestId: string): Promise<IBloodRequest> => {
+    const res = await api.patch<IBloodRequest>(
+      `/blood-requests/${requestId}/complete`,
+    );
+    return res.data;
+  },
+
+  deleteRequest: async (requestId: string): Promise<void> => {
+    await api.delete(`/blood-requests/${requestId}`);
   },
 };

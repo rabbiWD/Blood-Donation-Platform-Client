@@ -59,7 +59,7 @@ export function RequestCard({ request }: { request: IBloodRequest }) {
 
     try {
       setIsResponding(true);
-      await bloodRequestService.respondToRequest(request.id);
+      await bloodRequestService.acceptRequest(request.id);
       toast.success(
         "Response submitted! The patient has been notified of your support.",
       );

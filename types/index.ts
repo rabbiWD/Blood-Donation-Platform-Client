@@ -129,7 +129,9 @@ export interface IDonorAssignment {
   createdAt: string;
   updatedAt: string;
   bloodRequest?: IBloodRequest;
-  donor?: Pick<IUser, "id" | "name" | "profileImage">;
+  donor?: Pick<IUser, "id" | "name" | "profileImage"> & {
+    donorProfile?: IDonorProfile | null;
+  };
 }
 
 export interface IPayment {
