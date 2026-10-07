@@ -18,22 +18,29 @@ export function useAuth() {
     (state) => state.auth,
   );
 
-  // Hydrate session from backend /auth/me on initial app load if not already hydrated
+  const hasToken = typeof window !== "undefined" && !!authService.getToken();
+
+  // Hydrate session from backend /auth/me on initial app load only if token exists
   const { data: profile, isError } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: authService.getMe,
-    enabled: !isHydrated,
+    enabled: !isHydrated && hasToken,
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
 
   useEffect(() => {
-    if (profile) {
-      dispatch(setSession(profile));
-    } else if (isError) {
-      dispatch(clearSession());
+    if (!isHydrated) {
+      if (!hasToken) {
+        dispatch(clearSession());
+      } else if (profile) {
+        dispatch(setSession(profile));
+      } else if (isError) {
+        authService.clearTokens();
+        dispatch(clearSession());
+      }
     }
-  }, [profile, isError, dispatch]);
+  }, [profile, isError, hasToken, isHydrated, dispatch]);
 
   const login = useCallback(
     async (credentials: LoginInput) => {

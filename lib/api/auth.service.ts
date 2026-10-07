@@ -28,9 +28,49 @@ export interface IRegisterPayload {
   };
 }
 
+export const setClientCookie = (
+  name: string,
+  value: string,
+  maxAge: number,
+) => {
+  if (typeof document === "undefined") return;
+  // biome-ignore lint/suspicious/noDocumentCookie: cookie required for Next.js edge middleware
+  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+};
+
+export const clearClientCookie = (name: string) => {
+  if (typeof document === "undefined") return;
+  // biome-ignore lint/suspicious/noDocumentCookie: cookie required for Next.js edge middleware
+  document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
+};
+
 export const authService = {
+  getToken: (): string | null => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("accessToken");
+  },
+
+  setTokens: (accessToken: string, refreshToken?: string): void => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+    setClientCookie("accessToken", accessToken, 86400);
+  },
+
+  clearTokens: (): void => {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    clearClientCookie("accessToken");
+  },
+
   login: async (credentials: LoginInput): Promise<ILoginResponseData> => {
     const res = await api.post<ILoginResponseData>("/auth/login", credentials);
+    if (res.data?.accessToken) {
+      authService.setTokens(res.data.accessToken, res.data.refreshToken);
+    }
     return res.data;
   },
 
@@ -44,6 +84,7 @@ export const authService = {
   },
 
   logout: async (): Promise<void> => {
+    authService.clearTokens();
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {

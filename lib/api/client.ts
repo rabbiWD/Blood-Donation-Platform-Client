@@ -60,6 +60,9 @@ export async function request<T>(
   const isFormData =
     typeof FormData !== "undefined" && body instanceof FormData;
 
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+
   let response: Response;
   try {
     response = await fetch(buildUrl(path, params), {
@@ -70,6 +73,7 @@ export async function request<T>(
         ...(body !== undefined && !isFormData
           ? { "Content-Type": "application/json" }
           : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
       body:
@@ -94,6 +98,13 @@ export async function request<T>(
   }
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      // biome-ignore lint/suspicious/noDocumentCookie: cookie required for Next.js edge middleware
+      document.cookie = "accessToken=; path=/; max-age=0; SameSite=Lax";
+    }
+
     const message =
       isErrorBody(payload) && payload.message
         ? payload.message
