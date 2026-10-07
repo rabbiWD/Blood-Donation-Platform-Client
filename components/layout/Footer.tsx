@@ -52,8 +52,8 @@ export function Footer() {
       </div>
       <div className="border-t">
         <p className="mx-auto max-w-7xl px-4 py-4 text-center text-xs text-muted-foreground sm:px-6 lg:px-8">
-          © <CopyrightYear /> LifeLink Blood Donation Platform. Donate
-          blood, save lives.
+          © <CopyrightYear /> LifeLink Blood Donation Platform. Donate blood,
+          save lives.
         </p>
       </div>
     </footer>
