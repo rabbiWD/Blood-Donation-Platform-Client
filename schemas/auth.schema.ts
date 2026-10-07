@@ -68,3 +68,39 @@ export const registerSchema = z
   );
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string({ message: "Email is required" })
+    .email("Please enter a valid email address"),
+});
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({
+    email: z
+      .string({ message: "Email is required" })
+      .email("Please enter a valid email address"),
+    otp: z
+      .string({ message: "OTP code is required" })
+      .length(6, "OTP must be exactly 6 digits")
+      .regex(/^\d{6}$/, "OTP must consist of 6 numeric digits"),
+    newPassword: z
+      .string({ message: "New password is required" })
+      .min(8, "Password must be at least 8 characters long")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one digit")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Password must contain at least one special character",
+      ),
+    confirmPassword: z.string({ message: "Please confirm your new password" }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

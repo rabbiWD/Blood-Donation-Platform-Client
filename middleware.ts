@@ -55,13 +55,16 @@ export function middleware(request: NextRequest) {
   const role = decoded?.role;
 
   const isAuthPage =
-    pathname.startsWith("/login") || pathname.startsWith("/register");
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password");
   const isAdminPath = pathname.startsWith("/admin");
   const isDonorPath = pathname.startsWith("/donor");
   const isPatientPath = pathname.startsWith("/patient");
   const isProtectedPath = isAdminPath || isDonorPath || isPatientPath;
 
-  // 1. If user is already authenticated and visits /login or /register, redirect to their panel
+  // 1. If user is already authenticated and visits auth pages, redirect to their panel
   if (isAuthPage && role) {
     const target = ROLE_HOMES[role] || "/";
     return NextResponse.redirect(new URL(target, request.url));
@@ -102,5 +105,7 @@ export const config = {
     "/patient/:path*",
     "/login",
     "/register",
+    "/forgot-password",
+    "/reset-password",
   ],
 };

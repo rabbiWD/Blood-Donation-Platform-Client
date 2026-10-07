@@ -50,4 +50,20 @@ export const authService = {
       // Ignored if offline or server error
     }
   },
+
+  forgotPassword: async (payload: {
+    email: string;
+  }): Promise<{ message: string }> => {
+    const res = await api.post<null>("/auth/forgot-password", payload);
+    return { message: res.message || "OTP sent to your email" };
+  },
+
+  resetPassword: async (payload: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }): Promise<{ message: string }> => {
+    const res = await api.post<null>("/auth/reset-password", payload);
+    return { message: res.message || "Password reset successful" };
+  },
 };
