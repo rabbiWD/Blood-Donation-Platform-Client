@@ -39,7 +39,7 @@ export const registerSchema = z
         address: z.string().min(1, "Address is required"),
         city: z.string().min(1, "City is required"),
         district: z.string().min(1, "District is required"),
-        isAvailable: z.boolean().default(true),
+        isAvailable: z.boolean().optional(),
       })
       .optional(),
     patient: z
