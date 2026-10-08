@@ -22,11 +22,11 @@ export function HeroSection() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center opacity-25 dark:opacity-20 scale-105"
+          className="object-cover object-center opacity-80 dark:opacity-70"
         />
-        {/* Soft gradient overlays for maximum legibility in light & dark modes */}
-        <div className="absolute inset-0 bg-linear-to-r from-background via-background/80 to-background/60" />
-        <div className="absolute inset-0 bg-linear-to-b from-background/90 via-transparent to-background" />
+        {/* Directional gradient: clean contrast for left-side text while letting the image shine on the center & right */}
+        <div className="absolute inset-0 bg-linear-to-r from-background via-background/65 to-background/20 dark:from-background dark:via-background/75 dark:to-background/35" />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent opacity-80" />
       </div>
 
       {/* Decorative ambient gradients */}
@@ -116,7 +116,7 @@ export function HeroSection() {
 
           {/* Quick Emergency Action Card */}
           <div className="lg:col-span-5">
-            <div className="relative rounded-2xl border bg-card p-6 shadow-xl shadow-primary/5 sm:p-8">
+            <div className="relative rounded-2xl border bg-card/90 backdrop-blur-md p-6 shadow-2xl shadow-primary/10 sm:p-8">
               <div className="flex items-center justify-between pb-4 border-b">
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow">
