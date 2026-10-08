@@ -1,7 +1,23 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { Clock, HeartHandshake, MapPin, Users } from "lucide-react";
+import CountUp from "react-countup";
 import { StatCard } from "@/components/shared/StatCard";
+import { donorService } from "@/lib/api/donor.service";
 
 export function ImpactStats() {
+  const { data: stats } = useQuery({
+    queryKey: ["platform-stats"],
+    queryFn: donorService.getPlatformStats,
+    staleTime: 60 * 1000,
+  });
+
+  const livesSaved = stats?.livesSaved ?? 1840;
+  const activeDonors = stats?.activeDonors ?? 950;
+  const districtsCovered = stats?.districtsCovered ?? 64;
+  const avgResponseTime = stats?.avgResponseTimeMinutes ?? 12;
+
   return (
     <section className="py-12 sm:py-16 bg-muted/20 border-b">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -18,25 +34,64 @@ export function ImpactStats() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Lives Saved & Transfused"
-            value="1,840+"
+            value={
+              <span>
+                <CountUp
+                  end={livesSaved}
+                  duration={2.5}
+                  separator=","
+                  enableScrollSpy
+                  scrollSpyOnce
+                />
+                +
+              </span>
+            }
             icon={HeartHandshake}
             hint="Verified hospital transfusions"
           />
           <StatCard
             label="Active Voluntary Donors"
-            value="950+"
+            value={
+              <span>
+                <CountUp
+                  end={activeDonors}
+                  duration={2.5}
+                  separator=","
+                  enableScrollSpy
+                  scrollSpyOnce
+                />
+                +
+              </span>
+            }
             icon={Users}
             hint="Across all 8 blood groups"
           />
           <StatCard
             label="Districts Covered"
-            value="64"
+            value={
+              <CountUp
+                end={districtsCovered}
+                duration={2}
+                enableScrollSpy
+                scrollSpyOnce
+              />
+            }
             icon={MapPin}
             hint="Nationwide rapid coverage"
           />
           <StatCard
             label="Avg Response Time"
-            value="12 Mins"
+            value={
+              <span>
+                <CountUp
+                  end={avgResponseTime}
+                  duration={2}
+                  enableScrollSpy
+                  scrollSpyOnce
+                />{" "}
+                Mins
+              </span>
+            }
             icon={Clock}
             hint="From request to donor match"
           />
