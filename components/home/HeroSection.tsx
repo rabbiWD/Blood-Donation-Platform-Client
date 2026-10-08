@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Users,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -98,74 +99,76 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Quick Emergency Action Card */}
-          <div className="lg:col-span-5">
-            <div className="relative rounded-2xl border bg-card p-6 shadow-xl shadow-primary/5 sm:p-8">
-              <div className="flex items-center justify-between pb-4 border-b">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow">
-                    <Droplet className="size-5 fill-current" />
+          {/* Hero Visual Card with Public Image & Quick Emergency Actions */}
+          <div className="relative lg:col-span-5">
+            {/* Ambient Background Glow */}
+            <div
+              className="pointer-events-none absolute -inset-2 rounded-3xl bg-linear-to-tr from-primary/30 via-red-500/20 to-primary/10 blur-2xl opacity-70"
+              aria-hidden
+            />
+
+            <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card shadow-2xl transition-all duration-300 hover:shadow-primary/10">
+              {/* Image Frame */}
+              <div className="relative aspect-16/10 w-full overflow-hidden bg-muted group">
+                <Image
+                  src="/blood-img.jpg"
+                  alt="Blood Donation Volunteers"
+                  fill
+                  priority
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/25 to-transparent" />
+
+                {/* Live Float Badges over Image */}
+                <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between text-white">
+                  <div className="flex items-center gap-2 rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold backdrop-blur-md border border-white/15 shadow-sm">
+                    <span className="flex size-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Active Volunteers Ready</span>
                   </div>
+
+                  <div className="flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-[11px] font-bold text-white backdrop-blur-md shadow-md">
+                    <Droplet className="size-3 fill-current" />
+                    <span>24/7 Response</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Content below Image */}
+              <div className="p-5 sm:p-6 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b">
                   <div>
-                    <h2 className="font-heading text-base font-bold">
-                      Need Blood Fast?
+                    <h2 className="font-heading text-base font-bold text-foreground">
+                      Need Blood Urgently?
                     </h2>
                     <p className="text-xs text-muted-foreground">
                       Average response time under 15 minutes
                     </p>
                   </div>
-                </div>
-                <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400">
-                  LIVE
-                </span>
-              </div>
-
-              <div className="space-y-4 py-5">
-                <div className="rounded-xl border bg-muted/30 p-3.5 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-foreground">
-                      1. Check Compatibility
-                    </span>
-                    <span className="text-muted-foreground">All 8 Groups</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Instantly view available voluntary donors matching your
-                    exact patient blood group.
-                  </p>
+                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+                    LIVE
+                  </span>
                 </div>
 
-                <div className="rounded-xl border bg-muted/30 p-3.5 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-foreground">
-                      2. Post Emergency Request
-                    </span>
-                    <span className="text-primary font-bold">No Charge</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Send immediate notifications to active registered donors in
-                    your district or hospital.
-                  </p>
+                <div className="space-y-2">
+                  <Button asChild className="w-full justify-between" size="lg">
+                    <Link href="/patient/new-request">
+                      <span>Create Blood Request</span>
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full justify-between"
+                    size="sm"
+                  >
+                    <Link href="/register">
+                      <span>Register as a Lifesaver Donor</span>
+                      <Heart className="size-4 text-primary" />
+                    </Link>
+                  </Button>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Button asChild className="w-full justify-between" size="lg">
-                  <Link href="/patient/new-request">
-                    <span>Create Blood Request</span>
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full justify-between"
-                  size="sm"
-                >
-                  <Link href="/register">
-                    <span>Register as a Lifesaver Donor</span>
-                    <Heart className="size-4 text-primary" />
-                  </Link>
-                </Button>
               </div>
             </div>
           </div>
