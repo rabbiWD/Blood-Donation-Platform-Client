@@ -80,12 +80,22 @@ export function DashboardShell({
             <Button asChild variant="outline" size="sm">
               <Link href="/">Visit Site</Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <Avatar>
+            <Link
+              href={
+                userRole === "DONOR"
+                  ? "/donor/profile"
+                  : userRole === "PATIENT"
+                    ? "/patient/profile"
+                    : "/admin/profile"
+              }
+              className="flex items-center gap-2 rounded-lg p-1 transition-colors hover:bg-muted/80"
+              title="View and edit profile"
+            >
+              <Avatar className="size-8">
                 {user?.profileImage ? (
                   <AvatarImage src={user.profileImage} alt={user.name} />
                 ) : null}
-                <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+                <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -94,7 +104,7 @@ export function DashboardShell({
                   {user.name}
                 </span>
               ) : null}
-            </div>
+            </Link>
           </div>
         </header>
 

@@ -41,6 +41,7 @@ export const DASHBOARD_NAV: Record<"ADMIN" | "DONOR" | "PATIENT", INavLink[]> =
       { label: "Overview", href: "/admin", icon: LayoutDashboard },
       { label: "Users", href: "/admin/users", icon: Users },
       { label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
+      { label: "Profile", href: "/admin/profile", icon: UserCircle },
     ],
     DONOR: [
       { label: "Dashboard", href: "/donor", icon: LayoutDashboard },
@@ -50,6 +51,7 @@ export const DASHBOARD_NAV: Record<"ADMIN" | "DONOR" | "PATIENT", INavLink[]> =
         icon: ListChecks,
       },
       { label: "Donation History", href: "/donor/history", icon: History },
+      { label: "Profile", href: "/donor/profile", icon: UserCircle },
     ],
     PATIENT: [
       { label: "My Requests", href: "/patient", icon: ClipboardList },
