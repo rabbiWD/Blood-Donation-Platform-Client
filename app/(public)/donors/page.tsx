@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, RotateCcw, UserPlus } from "lucide-react";
+import { AlertCircle, Lock, LogIn, RotateCcw, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { DonorCard } from "@/components/donors/DonorCard";
@@ -18,12 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
 import { useUrlFilter } from "@/hooks/useUrlFilter";
 import { donorService } from "@/lib/api/donor.service";
 import { BLOOD_GROUP_LABELS } from "@/lib/constants";
 import { BLOOD_GROUPS } from "@/types";
 
 function DonorsDirectoryContent() {
+  const { isAuthenticated } = useAuth();
   const { get, getNumber, setFilter, reset, hasActiveFilters } = useUrlFilter();
 
   const search = get("search");
@@ -61,6 +63,30 @@ function DonorsDirectoryContent() {
           </Button>
         }
       />
+
+      {!isAuthenticated ? (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs">
+          <div className="flex items-center gap-2.5 text-foreground">
+            <Lock className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>
+              <strong>Browsing as Guest:</strong> Donor profiles and districts
+              are public. To protect donor privacy, direct phone numbers and
+              calling access require login.
+            </span>
+          </div>
+          <Button
+            asChild
+            size="sm"
+            variant="default"
+            className="shrink-0 font-semibold h-8 text-xs"
+          >
+            <Link href="/login">
+              <LogIn className="size-3.5 mr-1.5" />
+              Log In to Access
+            </Link>
+          </Button>
+        </div>
+      ) : null}
 
       {/* Filter and Search Bar */}
       <div className="rounded-2xl border bg-card p-4 sm:p-5 shadow-sm space-y-4">

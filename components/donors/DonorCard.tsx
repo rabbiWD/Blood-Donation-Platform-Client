@@ -5,9 +5,13 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Lock,
+  LogIn,
   MapPin,
   Phone,
+  ShieldAlert,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { BloodGroupBadge } from "@/components/shared/BloodGroupBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,9 +31,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/useAuth";
 import type { IDonorProfile } from "@/types";
 
 export function DonorCard({ donor }: { donor: IDonorProfile }) {
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
 
   const donorName = donor.user?.name || "Voluntary Donor";
@@ -125,14 +131,25 @@ export function DonorCard({ donor }: { donor: IDonorProfile }) {
       <CardFooter className="pt-3 border-t">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full gap-2 font-semibold"
-            >
-              <Phone className="size-3.5 text-primary" />
-              Contact Donor
-            </Button>
+            {isAuthenticated ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 font-semibold hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-colors"
+              >
+                <Phone className="size-3.5 text-primary" />
+                Contact Donor
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 font-semibold border-amber-500/30 bg-amber-500/5 text-foreground hover:bg-amber-500/10 transition-colors"
+              >
+                <Lock className="size-3.5 text-amber-600 dark:text-amber-400" />
+                Login to Contact
+              </Button>
+            )}
           </DialogTrigger>
 
           <DialogContent className="sm:max-w-md">
@@ -162,69 +179,133 @@ export function DonorCard({ donor }: { donor: IDonorProfile }) {
                 </div>
               </div>
               <DialogDescription>
-                Emergency contact information for voluntary blood coordination
+                {isAuthenticated
+                  ? "Emergency contact information for voluntary blood coordination"
+                  : "Authentication required to access donor direct contact details"}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-3 py-3 text-sm">
-              <div className="rounded-xl border bg-muted/30 p-4 space-y-2.5">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground text-xs">
-                    Direct Phone:
-                  </span>
-                  <a
-                    href={`tel:${donor.contactNumber}`}
-                    className="font-mono text-base font-bold text-primary hover:underline flex items-center gap-1.5"
-                  >
-                    <Phone className="size-4" />
-                    {donor.contactNumber}
-                  </a>
+            {isAuthenticated ? (
+              <div className="space-y-3 py-3 text-sm">
+                <div className="rounded-xl border bg-muted/30 p-4 space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground text-xs">
+                      Direct Phone:
+                    </span>
+                    <a
+                      href={`tel:${donor.contactNumber}`}
+                      className="font-mono text-base font-bold text-primary hover:underline flex items-center gap-1.5"
+                    >
+                      <Phone className="size-4" />
+                      {donor.contactNumber}
+                    </a>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Address Area:</span>
+                    <span className="font-medium text-foreground text-right">
+                      {donor.address}, {donor.city}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">District:</span>
+                    <span className="font-medium text-foreground">
+                      {donor.district}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      Total Donations:
+                    </span>
+                    <span className="font-semibold text-emerald-600">
+                      {donor.totalDonations} Lives Touched
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Address Area:</span>
-                  <span className="font-medium text-foreground text-right">
-                    {donor.address}, {donor.city}
-                  </span>
+
+                <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  <p className="font-semibold text-foreground mb-1">
+                    Ethical Guidance:
+                  </p>
+                  <p>
+                    Please only contact voluntary donors for genuine medical
+                    emergencies. Commercial compensation of blood is strictly
+                    prohibited.
+                  </p>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">District:</span>
-                  <span className="font-medium text-foreground">
-                    {donor.district}
-                  </span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">
-                    Total Donations:
-                  </span>
-                  <span className="font-semibold text-emerald-600">
-                    {donor.totalDonations} Lives Touched
-                  </span>
+
+                <div className="flex gap-2 justify-end pt-2">
+                  <Button variant="outline" onClick={() => setOpen(false)}>
+                    Close
+                  </Button>
+                  <Button asChild className="gap-2">
+                    <a href={`tel:${donor.contactNumber}`}>
+                      <Phone className="size-4" />
+                      Call Now
+                    </a>
+                  </Button>
                 </div>
               </div>
+            ) : (
+              <div className="space-y-4 py-3 text-sm">
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-950 dark:text-amber-200 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-amber-800 dark:text-amber-300">
+                    <ShieldAlert className="size-4 shrink-0" />
+                    <span>Donor Privacy Protection</span>
+                  </div>
+                  <p className="leading-relaxed">
+                    To protect our voluntary blood donors from spam and ensure
+                    emergency legitimacy, direct phone numbers and coordinates
+                    are only visible to logged-in members.
+                  </p>
+                </div>
 
-              <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-                <p className="font-semibold text-foreground mb-1">
-                  Ethical Guidance:
-                </p>
-                <p>
-                  Please only contact voluntary donors for genuine medical
-                  emergencies. Commercial compensation of blood is strictly
-                  prohibited.
-                </p>
+                <div className="rounded-xl border bg-muted/30 p-4 space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Direct Phone:</span>
+                    <span className="font-mono font-semibold tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <Lock className="size-3.5 text-amber-500" />
+                      {donor.contactNumber || "+880 17•• ••••••"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Area:</span>
+                    <span className="font-medium text-foreground">
+                      {donor.city}, {donor.district}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Lives Touched:
+                    </span>
+                    <span className="font-semibold text-emerald-600">
+                      {donor.totalDonations} Donations
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border bg-card p-4 text-center space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Sign in to your account to unlock direct contact details
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button asChild className="flex-1 font-semibold" size="sm">
+                      <Link href="/login">
+                        <LogIn className="size-4 mr-1.5" />
+                        Log In to Access
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="flex-1 font-semibold"
+                      size="sm"
+                    >
+                      <Link href="/register">Create Account</Link>
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setOpen(false)}>
-                Close
-              </Button>
-              <Button asChild className="gap-2">
-                <a href={`tel:${donor.contactNumber}`}>
-                  <Phone className="size-4" />
-                  Call Now
-                </a>
-              </Button>
-            </div>
+            )}
           </DialogContent>
         </Dialog>
       </CardFooter>
