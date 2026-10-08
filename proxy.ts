@@ -47,7 +47,7 @@ const ROLE_HOMES: Record<string, string> = {
   PATIENT: "/patient",
 };
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const tokenCookie = request.cookies.get("accessToken");
   const token = tokenCookie?.value;

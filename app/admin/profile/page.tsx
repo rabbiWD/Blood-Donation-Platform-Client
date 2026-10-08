@@ -238,7 +238,10 @@ export default function AdminProfilePage() {
                 <Clock className="h-3.5 w-3.5" />
                 Admin Since
               </span>
-              <span className="font-medium text-foreground">
+              <span
+                suppressHydrationWarning
+                className="font-medium text-foreground"
+              >
                 {userProfile?.createdAt
                   ? new Date(userProfile.createdAt).toLocaleDateString(
                       "en-US",

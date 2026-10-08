@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,8 +26,18 @@ function PaymentSuccessContent() {
   const trxID = searchParams.get("trxID") || paymentID;
   const amount = searchParams.get("amount") || "500";
   const [copied, setCopied] = useState(false);
+  const [formattedDate, setFormattedDate] = useState<string>("");
 
   const { user, role, isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    setFormattedDate(
+      new Date().toLocaleString("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    );
+  }, []);
 
   const handleCopyTrx = () => {
     navigator.clipboard.writeText(trxID);
@@ -157,11 +167,11 @@ function PaymentSuccessContent() {
               <span className="text-muted-foreground block text-[11px] font-medium">
                 Timestamp
               </span>
-              <span className="font-medium text-foreground text-xs">
-                {new Date().toLocaleString("en-US", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
+              <span
+                suppressHydrationWarning
+                className="font-medium text-foreground text-xs"
+              >
+                {formattedDate || "Recent"}
               </span>
             </div>
           </div>

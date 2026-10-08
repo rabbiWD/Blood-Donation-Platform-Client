@@ -111,7 +111,7 @@ export function RequestCard({ request }: { request: IBloodRequest }) {
 
         <div className="flex items-start gap-2">
           <Clock className="size-3.5 text-muted-foreground shrink-0 mt-0.5" />
-          <span>Needed by: {neededDate}</span>
+          <span suppressHydrationWarning>Needed by: {neededDate}</span>
         </div>
 
         {request.additionalNotes ? (
@@ -173,7 +173,10 @@ export function RequestCard({ request }: { request: IBloodRequest }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Needed By:</span>
-                  <span className="font-semibold text-foreground">
+                  <span
+                    suppressHydrationWarning
+                    className="font-semibold text-foreground"
+                  >
                     {neededDate}
                   </span>
                 </div>

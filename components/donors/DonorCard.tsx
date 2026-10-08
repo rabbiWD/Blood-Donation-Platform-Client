@@ -113,7 +113,12 @@ export function DonorCard({ donor }: { donor: IDonorProfile }) {
             <Calendar className="size-3.5 text-muted-foreground" />
             Last Transfusion:
           </span>
-          <span className="font-medium text-foreground">{lastDonation}</span>
+          <span
+            suppressHydrationWarning
+            className="font-medium text-foreground"
+          >
+            {lastDonation}
+          </span>
         </div>
       </CardContent>
 
