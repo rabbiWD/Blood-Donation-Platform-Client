@@ -99,7 +99,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Hero Visual Card with Public Image & Quick Emergency Actions */}
+          {/* Hero Visual Card with Background Image */}
           <div className="relative lg:col-span-5">
             {/* Ambient Background Glow */}
             <div
@@ -107,51 +107,80 @@ export function HeroSection() {
               aria-hidden
             />
 
-            <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card shadow-2xl transition-all duration-300 hover:shadow-primary/10">
-              {/* Image Frame */}
-              <div className="relative aspect-16/10 w-full overflow-hidden bg-muted group">
+            <div className="relative overflow-hidden rounded-3xl border border-white/20 shadow-2xl transition-all duration-300 hover:shadow-primary/20">
+              {/* Background Image with Dark Vignette Overlay */}
+              <div className="absolute inset-0 z-0">
                 <Image
                   src="/blood-img.jpg"
-                  alt="Blood Donation Volunteers"
+                  alt="Blood Donation Lifesavers"
                   fill
                   priority
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 42vw"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/25 to-transparent" />
-
-                {/* Live Float Badges over Image */}
-                <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between text-white">
-                  <div className="flex items-center gap-2 rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold backdrop-blur-md border border-white/15 shadow-sm">
-                    <span className="flex size-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Active Volunteers Ready</span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-[11px] font-bold text-white backdrop-blur-md shadow-md">
-                    <Droplet className="size-3 fill-current" />
-                    <span>24/7 Response</span>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-linear-to-b from-black/65 via-black/75 to-black/90 backdrop-blur-[1px]" />
               </div>
 
-              {/* Action Content below Image */}
-              <div className="p-5 sm:p-6 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b">
-                  <div>
-                    <h2 className="font-heading text-base font-bold text-foreground">
-                      Need Blood Urgently?
-                    </h2>
-                    <p className="text-xs text-muted-foreground">
-                      Average response time under 15 minutes
-                    </p>
+              {/* Foreground Content on Top of Background Image */}
+              <div className="relative z-10 p-6 sm:p-8 space-y-6 text-white">
+                <div className="flex items-center justify-between pb-4 border-b border-white/15">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-11 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/30">
+                      <Droplet className="size-5 fill-current" />
+                    </div>
+                    <div>
+                      <h2 className="font-heading text-lg font-bold text-white tracking-tight">
+                        Need Blood Urgently?
+                      </h2>
+                      <p className="text-xs text-zinc-300">
+                        Average response time under 15 minutes
+                      </p>
+                    </div>
                   </div>
-                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-950/40 dark:text-red-400">
-                    LIVE
+                  <span className="flex items-center gap-1.5 rounded-full bg-red-600/80 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md border border-white/10">
+                    <span className="size-1.5 rounded-full bg-white animate-pulse" />
+                    LIVE 24/7
                   </span>
                 </div>
 
-                <div className="space-y-2">
-                  <Button asChild className="w-full justify-between" size="lg">
+                <div className="space-y-3">
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-white">
+                        1. Check Compatibility
+                      </span>
+                      <span className="text-zinc-300 font-medium">
+                        All 8 Groups
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      Instantly view available voluntary donors matching your
+                      exact patient blood group.
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-white">
+                        2. Post Emergency Request
+                      </span>
+                      <span className="text-emerald-400 font-bold">
+                        100% Free
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      Send immediate notifications to active registered donors
+                      in your district or hospital.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 pt-1">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="w-full justify-between font-semibold shadow-lg shadow-primary/30"
+                  >
                     <Link href="/patient/new-request">
                       <span>Create Blood Request</span>
                       <ArrowRight className="size-4" />
@@ -160,14 +189,23 @@ export function HeroSection() {
                   <Button
                     asChild
                     variant="outline"
-                    className="w-full justify-between"
-                    size="sm"
+                    size="default"
+                    className="w-full justify-between font-medium border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white backdrop-blur-md"
                   >
                     <Link href="/register">
                       <span>Register as a Lifesaver Donor</span>
-                      <Heart className="size-4 text-primary" />
+                      <Heart className="size-4 text-red-400" />
                     </Link>
                   </Button>
+                </div>
+
+                {/* Micro trust stats badge */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[11px] text-zinc-300">
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-emerald-400" />
+                    Verified Donors Active
+                  </span>
+                  <span>Across 64 Districts</span>
                 </div>
               </div>
             </div>
