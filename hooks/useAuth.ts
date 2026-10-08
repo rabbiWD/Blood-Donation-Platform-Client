@@ -84,12 +84,35 @@ export function useAuth() {
     router.push("/login");
   }, [dispatch, queryClient, router]);
 
+  const googleLogin = useCallback(
+    async (payload: { idToken: string; role?: "DONOR" | "PATIENT" }) => {
+      try {
+        const { user: loggedInUser } = await authService.googleLogin(payload);
+        dispatch(setSession(loggedInUser));
+        queryClient.setQueryData(["auth", "me"], loggedInUser);
+        toast.success(`Welcome back, ${loggedInUser.name}!`);
+
+        const destination = ROLE_HOME[loggedInUser.role] || "/";
+        router.push(destination);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Google sign-in failed. Please try again.";
+        toast.error(message);
+        throw err;
+      }
+    },
+    [dispatch, queryClient, router],
+  );
+
   return {
     user,
     role,
     isAuthenticated,
     isHydrated,
     login,
+    googleLogin,
     logout,
   };
 }

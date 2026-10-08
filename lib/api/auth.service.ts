@@ -94,6 +94,20 @@ export const authService = {
     return res.data;
   },
 
+  googleLogin: async (payload: {
+    idToken: string;
+    role?: "DONOR" | "PATIENT";
+  }): Promise<ILoginResponseData> => {
+    const res = await api.post<ILoginResponseData>("/auth/google", payload);
+    if (res.data?.accessToken) {
+      authService.setTokens(res.data.accessToken, res.data.refreshToken);
+      if (res.data?.user) {
+        authService.setUser(res.data.user);
+      }
+    }
+    return res.data;
+  },
+
   register: async (payload: IRegisterPayload): Promise<void> => {
     await api.post<null>("/auth/register", payload);
   },
