@@ -59,10 +59,27 @@ export const authService = {
     setClientCookie("accessToken", accessToken, 86400);
   },
 
+  setUser: (user: IUser): void => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("user", JSON.stringify(user));
+  },
+
+  getUser: (): IUser | null => {
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem("user");
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as IUser;
+    } catch {
+      return null;
+    }
+  },
+
   clearTokens: (): void => {
     if (typeof window === "undefined") return;
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
     clearClientCookie("accessToken");
   },
 
@@ -70,6 +87,9 @@ export const authService = {
     const res = await api.post<ILoginResponseData>("/auth/login", credentials);
     if (res.data?.accessToken) {
       authService.setTokens(res.data.accessToken, res.data.refreshToken);
+      if (res.data?.user) {
+        authService.setUser(res.data.user);
+      }
     }
     return res.data;
   },

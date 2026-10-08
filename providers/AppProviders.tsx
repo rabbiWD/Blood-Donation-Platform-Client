@@ -29,6 +29,13 @@ function makeQueryClient() {
   });
 }
 
+import { useAuth } from "@/hooks/useAuth";
+
+function SessionHydrator() {
+  useAuth();
+  return null;
+}
+
 export function AppProviders({ children }: { children: ReactNode }) {
   const [store] = useState<AppStore>(() => makeStore());
   const [queryClient] = useState(() => makeQueryClient());
@@ -36,6 +43,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
+        <SessionHydrator />
         {children}
         <Toaster richColors position="top-right" closeButton />
       </QueryClientProvider>

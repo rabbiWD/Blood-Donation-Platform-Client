@@ -29,18 +29,30 @@ export function useAuth() {
     retry: false,
   });
 
+  // 1. Immediately hydrate from cached user on mount if token exists
   useEffect(() => {
     if (!isHydrated) {
-      if (!hasToken) {
-        dispatch(clearSession());
-      } else if (profile) {
-        dispatch(setSession(profile));
-      } else if (isError) {
-        authService.clearTokens();
+      if (hasToken) {
+        const cached = authService.getUser();
+        if (cached) {
+          dispatch(setSession(cached));
+        }
+      } else {
         dispatch(clearSession());
       }
     }
-  }, [profile, isError, hasToken, isHydrated, dispatch]);
+  }, [hasToken, isHydrated, dispatch]);
+
+  // 2. Synchronize with fresh server profile once /auth/me returns
+  useEffect(() => {
+    if (profile) {
+      authService.setUser(profile);
+      dispatch(setSession(profile));
+    } else if (isError) {
+      authService.clearTokens();
+      dispatch(clearSession());
+    }
+  }, [profile, isError, dispatch]);
 
   const login = useCallback(
     async (credentials: LoginInput) => {
