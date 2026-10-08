@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -207,6 +208,21 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-muted" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 font-medium text-muted-foreground">
+                Or Continue With
+              </span>
+            </div>
+          </div>
+
+          {/* Google Social Login */}
+          <GoogleLoginButton disabled={isAnyLoading} />
 
           {/* Divider */}
           <div className="relative">
