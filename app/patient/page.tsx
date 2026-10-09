@@ -3,15 +3,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertCircle,
+  AlertTriangle,
   Building,
   CheckCircle2,
   Clock,
   Heart,
+  Loader2,
   Phone,
   PlusCircle,
   Trash2,
   Users,
 } from "lucide-react";
+
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -73,6 +76,8 @@ export default function PatientDashboardPage() {
   const [selectedRequest, setSelectedRequest] = useState<IBloodRequest | null>(
     null,
   );
+  const [deleteRequestTarget, setDeleteRequestTarget] =
+    useState<IBloodRequest | null>(null);
 
   const {
     data: requests = [],
@@ -99,7 +104,8 @@ export default function PatientDashboardPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => bloodRequestService.deleteRequest(id),
     onSuccess: () => {
-      toast.success("Blood request removed");
+      toast.success("Blood request removed successfully");
+      setDeleteRequestTarget(null);
       queryClient.invalidateQueries({ queryKey: ["my-blood-requests"] });
     },
     onError: (err: unknown) => {
@@ -318,15 +324,8 @@ export default function PatientDashboardPage() {
                               variant="ghost"
                               className="h-8 text-xs text-destructive hover:bg-destructive/10"
                               disabled={deleteMutation.isPending}
-                              onClick={() => {
-                                if (
-                                  confirm(
-                                    "Are you sure you want to delete this blood request?",
-                                  )
-                                ) {
-                                  deleteMutation.mutate(req.id);
-                                }
-                              }}
+                              onClick={() => setDeleteRequestTarget(req)}
+                              title="Delete Blood Request"
                             >
                               <Trash2 className="size-3.5" />
                             </Button>
@@ -410,6 +409,105 @@ export default function PatientDashboardPage() {
           </DialogContent>
         </Dialog>
       ) : null}
+
+      {/* Unique Custom Delete Confirmation Modal */}
+      <Dialog
+        open={!!deleteRequestTarget}
+        onOpenChange={(open) => {
+          if (!open && !deleteMutation.isPending) {
+            setDeleteRequestTarget(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden border border-destructive/20 shadow-2xl">
+          <div className="relative p-6 pb-4 text-center">
+            {/* Top decorative animated danger badge */}
+            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 shadow-xs ring-4 ring-destructive/5 animate-in zoom-in-75 duration-200">
+              <Trash2 className="size-7" />
+            </div>
+
+            <DialogTitle className="font-heading text-xl font-bold tracking-tight text-foreground">
+              Delete Blood Request?
+            </DialogTitle>
+            <DialogDescription className="mt-1 text-xs text-muted-foreground">
+              Are you sure you want to permanently delete this emergency
+              request?
+            </DialogDescription>
+
+            {/* Target Request Info Card */}
+            {deleteRequestTarget ? (
+              <div className="mt-4 rounded-xl border bg-muted/40 p-3.5 text-left text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground flex items-center gap-1.5">
+                    <BloodGroupBadge
+                      group={deleteRequestTarget.bloodGroup}
+                      size="sm"
+                    />
+                    {deleteRequestTarget.patientName}
+                  </span>
+                  <Badge variant="outline" className="text-[10px] font-mono">
+                    {deleteRequestTarget.unitsNeeded}{" "}
+                    {deleteRequestTarget.unitsNeeded === 1 ? "Unit" : "Units"}
+                  </Badge>
+                </div>
+                <div className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Building className="size-3 shrink-0" />
+                  <span className="truncate">
+                    {deleteRequestTarget.hospitalName}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Warning Callout Box */}
+            <div className="mt-3 flex items-start gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5 text-left text-[11px] text-amber-700 dark:text-amber-400">
+              <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+              <span>
+                This action cannot be undone. Active donors searching the
+                network will immediately stop seeing this emergency post.
+              </span>
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex items-center justify-end gap-2.5 border-t bg-muted/30 px-6 py-3.5">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={deleteMutation.isPending}
+              onClick={() => setDeleteRequestTarget(null)}
+              className="font-medium"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                if (deleteRequestTarget) {
+                  deleteMutation.mutate(deleteRequestTarget.id);
+                }
+              }}
+              className="gap-1.5 font-semibold shadow-sm"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="size-3.5" />
+                  Yes, Delete Request
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
