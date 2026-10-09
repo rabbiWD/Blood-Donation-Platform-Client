@@ -34,11 +34,11 @@ export const registerSchema = z
     role: z.enum(["DONOR", "PATIENT"]),
     donor: z
       .object({
-        bloodGroup: z.enum(BLOOD_GROUPS),
-        contactNumber: z.string().min(1, "Contact number is required"),
-        address: z.string().min(1, "Address is required"),
-        city: z.string().min(1, "City is required"),
-        district: z.string().min(1, "District is required"),
+        bloodGroup: z.enum(BLOOD_GROUPS).optional(),
+        contactNumber: z.string().optional(),
+        address: z.string().optional(),
+        city: z.string().optional(),
+        district: z.string().optional(),
         isAvailable: z.boolean().optional(),
       })
       .optional(),
@@ -50,24 +50,68 @@ export const registerSchema = z
       })
       .optional(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  })
-  .refine(
-    (data) => {
-      if (data.role === "DONOR") {
-        return !!data.donor?.bloodGroup && !!data.donor?.contactNumber;
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
+    }
+
+    if (data.role === "DONOR") {
+      if (!data.donor?.bloodGroup) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Blood group is required",
+          path: ["donor", "bloodGroup"],
+        });
       }
-      return true;
-    },
-    {
-      message: "Donor details are required for Donor accounts",
-      path: ["donor", "bloodGroup"],
-    },
-  );
+      if (!data.donor?.contactNumber || data.donor.contactNumber.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Contact number is required",
+          path: ["donor", "contactNumber"],
+        });
+      }
+      if (!data.donor?.district || data.donor.district.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "District is required",
+          path: ["donor", "district"],
+        });
+      }
+      if (!data.donor?.city || data.donor.city.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "City is required",
+          path: ["donor", "city"],
+        });
+      }
+      if (!data.donor?.address || data.donor.address.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Address details are required",
+          path: ["donor", "address"],
+        });
+      }
+    }
+  });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const verifyEmailSchema = z.object({
+  email: z
+    .string({ message: "Email is required" })
+    .email("Please enter a valid email address"),
+  otp: z
+    .string({ message: "OTP code is required" })
+    .length(6, "OTP must be exactly 6 digits")
+    .regex(/^\d{6}$/, "OTP must consist of 6 numeric digits"),
+});
+
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+
 
 export const forgotPasswordSchema = z.object({
   email: z
