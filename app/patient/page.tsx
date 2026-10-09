@@ -498,17 +498,17 @@ export default function PatientDashboardPage() {
                   deleteMutation.mutate(deleteRequestTarget.id);
                 }
               }}
-              className="text-xs h-9 gap-1.5 font-semibold bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm"
+              className="text-xs h-9 gap-1.5 font-semibold bg-red-600 hover:bg-red-700 text-white shadow-sm transition-all focus:ring-2 focus:ring-red-500/30"
             >
               {deleteMutation.isPending ? (
                 <>
-                  <Loader2 className="size-3.5 animate-spin" />
-                  Deleting...
+                  <Loader2 className="size-3.5 animate-spin text-white" />
+                  <span className="text-white">Deleting...</span>
                 </>
               ) : (
                 <>
-                  <Trash2 className="size-3.5" />
-                  Yes, Delete Request
+                  <Trash2 className="size-3.5 text-white" />
+                  <span className="text-white">Yes, Delete Request</span>
                 </>
               )}
             </AlertDialogAction>
