@@ -64,7 +64,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     role: "PATIENT",
     title: "Patient / Requester",
     badge: "Emergency Requester",
-    email: "patient@blooddonation.com",
+    email: "mahinachowdhury0@gmail.com",
     pass: "Patient@123456",
     icon: UserCheck,
     colorClass:
