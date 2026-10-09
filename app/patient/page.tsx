@@ -24,6 +24,16 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { TableSkeleton } from "@/components/shared/Skeletons";
 import { StatCard } from "@/components/shared/StatCard";
 import { UrgencyBadge } from "@/components/shared/UrgencyBadge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -410,8 +420,8 @@ export default function PatientDashboardPage() {
         </Dialog>
       ) : null}
 
-      {/* Unique Custom Delete Confirmation Modal */}
-      <Dialog
+      {/* shadcn/ui AlertDialog for Safe Deletion */}
+      <AlertDialog
         open={!!deleteRequestTarget}
         onOpenChange={(open) => {
           if (!open && !deleteMutation.isPending) {
@@ -419,20 +429,22 @@ export default function PatientDashboardPage() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden border border-destructive/20 shadow-2xl">
-          <div className="relative p-6 pb-4 text-center">
-            {/* Top decorative animated danger badge */}
-            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 shadow-xs ring-4 ring-destructive/5 animate-in zoom-in-75 duration-200">
-              <Trash2 className="size-7" />
-            </div>
-
-            <DialogTitle className="font-heading text-xl font-bold tracking-tight text-foreground">
-              Delete Blood Request?
-            </DialogTitle>
-            <DialogDescription className="mt-1 text-xs text-muted-foreground">
-              Are you sure you want to permanently delete this emergency
-              request?
-            </DialogDescription>
+        <AlertDialogContent className="sm:max-w-md p-0 overflow-hidden border border-destructive/20 shadow-2xl">
+          <div className="relative p-6 pb-2 text-center sm:text-left">
+            <AlertDialogHeader className="sm:flex-row sm:items-start gap-4">
+              <div className="mx-auto sm:mx-0 flex size-12 shrink-0 items-center justify-center rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 shadow-xs ring-4 ring-destructive/5 animate-in zoom-in-75 duration-200">
+                <Trash2 className="size-6" />
+              </div>
+              <div className="space-y-1">
+                <AlertDialogTitle className="font-heading text-lg font-bold tracking-tight text-foreground">
+                  Delete Blood Request?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-xs text-muted-foreground leading-relaxed">
+                  Are you sure you want to permanently delete this emergency
+                  request? This action cannot be undone.
+                </AlertDialogDescription>
+              </div>
+            </AlertDialogHeader>
 
             {/* Target Request Info Card */}
             {deleteRequestTarget ? (
@@ -463,35 +475,30 @@ export default function PatientDashboardPage() {
             <div className="mt-3 flex items-start gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5 text-left text-[11px] text-amber-700 dark:text-amber-400">
               <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
               <span>
-                This action cannot be undone. Active donors searching the
-                network will immediately stop seeing this emergency post.
+                Active donors searching the network will immediately stop seeing
+                this emergency post.
               </span>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-2.5 border-t bg-muted/30 px-6 py-3.5">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
+          <AlertDialogFooter className="border-t bg-muted/30 px-6 py-3.5 gap-2.5 sm:justify-end">
+            <AlertDialogCancel
               disabled={deleteMutation.isPending}
               onClick={() => setDeleteRequestTarget(null)}
-              className="font-medium"
+              className="text-xs h-9 font-medium"
             >
               Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
+            </AlertDialogCancel>
+            <AlertDialogAction
               disabled={deleteMutation.isPending}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 if (deleteRequestTarget) {
                   deleteMutation.mutate(deleteRequestTarget.id);
                 }
               }}
-              className="gap-1.5 font-semibold shadow-sm"
+              className="text-xs h-9 gap-1.5 font-semibold bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm"
             >
               {deleteMutation.isPending ? (
                 <>
@@ -504,10 +511,10 @@ export default function PatientDashboardPage() {
                   Yes, Delete Request
                 </>
               )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
