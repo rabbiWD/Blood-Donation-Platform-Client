@@ -2,12 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ArrowLeft,
   Eye,
   EyeOff,
   Heart,
   Loader2,
   Lock,
   Mail,
+  MailCheck,
   MapPin,
   Phone,
   ShieldCheck,
@@ -16,7 +18,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { type FieldErrors, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,19 +41,32 @@ import {
 } from "@/components/ui/select";
 import { authService } from "@/lib/api/auth.service";
 import { BLOOD_GROUP_LABELS } from "@/lib/constants";
+import { ROLE_HOME } from "@/lib/navigation";
 import { type RegisterInput, registerSchema } from "@/schemas/auth.schema";
+import { useAppDispatch } from "@/store/hooks";
+import { setSession } from "@/store/slices/authSlice";
 import { BLOOD_GROUPS, type BloodGroup } from "@/types";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = useState<"REGISTER" | "OTP">("REGISTER");
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [cachedPayload, setCachedPayload] = useState<RegisterInput | null>(
+    null,
+  );
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -80,8 +95,39 @@ export default function RegisterPage() {
   const selectedRole = watch("role");
   const selectedBloodGroup = watch("donor.bloodGroup");
 
+  const onInvalid = (formErrors: FieldErrors<RegisterInput>) => {
+    if (formErrors.name?.message) {
+      toast.error(formErrors.name.message);
+      return;
+    }
+    if (formErrors.email?.message) {
+      toast.error(formErrors.email.message);
+      return;
+    }
+    if (formErrors.password?.message) {
+      toast.error(formErrors.password.message);
+      return;
+    }
+    if (formErrors.confirmPassword?.message) {
+      toast.error(formErrors.confirmPassword.message);
+      return;
+    }
+    if (formErrors.donor) {
+      const donorKey = Object.keys(formErrors.donor)[0] as keyof NonNullable<
+        RegisterInput["donor"]
+      >;
+      const donorErr = formErrors.donor[donorKey];
+      if (donorErr?.message) {
+        toast.error(donorErr.message);
+        return;
+      }
+    }
+    toast.error("Please fill in all required fields properly.");
+  };
+
   const onSubmit = async (data: RegisterInput) => {
     try {
+      setCachedPayload(data);
       await authService.register({
         name: data.name,
         email: data.email,
@@ -107,16 +153,189 @@ export default function RegisterPage() {
             }),
       });
 
+      setRegisteredEmail(data.email);
+      setStep("OTP");
       toast.success(
-        "Account created successfully! Please sign in with your credentials.",
+        "Verification code sent! Please check your email to activate your account.",
       );
-      router.push("/login");
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Failed to create account";
       toast.error(message);
     }
   };
+
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.trim().length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP code");
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const result = await authService.verifyEmail({
+        email: registeredEmail,
+        otp: otp.trim(),
+      });
+
+      if (result.user) {
+        dispatch(setSession(result.user));
+        toast.success(
+          `Account verified! Welcome to LifeLink, ${result.user.name}.`,
+        );
+        const destination = ROLE_HOME[result.user.role] || "/dashboard";
+        router.push(destination);
+      } else {
+        toast.success("Account verified successfully! Please sign in.");
+        router.push("/login");
+      }
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Invalid or expired OTP code";
+      toast.error(message);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!cachedPayload) {
+      toast.error(
+        "Session expired. Please fill out the registration form again.",
+      );
+      setStep("REGISTER");
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      await authService.register({
+        name: cachedPayload.name,
+        email: cachedPayload.email,
+        password: cachedPayload.password,
+        role: cachedPayload.role,
+        ...(cachedPayload.role === "DONOR"
+          ? {
+              donor: {
+                bloodGroup: cachedPayload.donor?.bloodGroup || "O_POSITIVE",
+                contactNumber: cachedPayload.donor?.contactNumber || "",
+                address: cachedPayload.donor?.address || "",
+                city: cachedPayload.donor?.city || "",
+                district: cachedPayload.donor?.district || "",
+                isAvailable: cachedPayload.donor?.isAvailable ?? true,
+              },
+            }
+          : {
+              patient: {
+                contactNumber:
+                  cachedPayload.patient?.contactNumber || undefined,
+                address: cachedPayload.patient?.address || undefined,
+                hospitalName: cachedPayload.patient?.hospitalName || undefined,
+              },
+            }),
+      });
+      toast.success("A fresh 6-digit verification code has been sent!");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to resend code";
+      toast.error(message);
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  if (step === "OTP") {
+    return (
+      <div className="w-full max-w-md space-y-6">
+        <Card className="border shadow-lg">
+          <CardHeader className="space-y-2 text-center">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <MailCheck className="size-6" />
+            </div>
+            <CardTitle className="font-heading text-2xl font-bold tracking-tight">
+              Verify Your Email
+            </CardTitle>
+            <CardDescription className="text-sm">
+              We have sent a 6-digit verification code to{" "}
+              <span className="font-semibold text-foreground">
+                {registeredEmail}
+              </span>
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-5">
+            <div className="space-y-2">
+              <Label
+                htmlFor="otp"
+                className="text-xs uppercase tracking-wider text-muted-foreground text-center block"
+              >
+                6-Digit Verification Code
+              </Label>
+              <Input
+                id="otp"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                placeholder="123456"
+                className="text-center font-mono text-2xl tracking-[0.5em] font-bold h-13"
+                autoFocus
+              />
+              <p className="text-center text-[11px] text-muted-foreground">
+                Please check your inbox or spam folder for the code.
+              </p>
+            </div>
+
+            <Button
+              type="button"
+              onClick={handleVerifyOtp}
+              className="w-full font-semibold"
+              size="lg"
+              disabled={isVerifying || otp.trim().length !== 6}
+            >
+              {isVerifying ? (
+                <>
+                  <Loader2 className="size-4 animate-spin mr-2" />
+                  Verifying Account...
+                </>
+              ) : (
+                "Verify & Complete Registration"
+              )}
+            </Button>
+
+            <div className="flex items-center justify-between text-xs pt-1">
+              <button
+                type="button"
+                onClick={() => setStep("REGISTER")}
+                className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="size-3.5" /> Edit Information
+              </button>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={isResending}
+                className="text-primary font-medium hover:underline disabled:opacity-50"
+              >
+                {isResending ? "Resending..." : "Resend Code"}
+              </button>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex justify-center border-t py-4 text-center text-xs text-muted-foreground">
+            Already verified?{" "}
+            <Link
+              href="/login"
+              className="ml-1 font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              Sign In
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-xl space-y-6">
@@ -132,14 +351,20 @@ export default function RegisterPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            onSubmit={handleSubmit(onSubmit, onInvalid)}
+            className="space-y-5"
+          >
             {/* Role Selection Tabs */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Select Your Role</Label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setValue("role", "DONOR")}
+                  onClick={() => {
+                    setValue("role", "DONOR");
+                    clearErrors();
+                  }}
                   className={`flex items-center justify-center gap-2 rounded-xl border p-3 font-heading text-sm font-semibold transition-all ${
                     selectedRole === "DONOR"
                       ? "border-primary bg-primary/10 text-primary shadow-sm"
@@ -151,7 +376,10 @@ export default function RegisterPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setValue("role", "PATIENT")}
+                  onClick={() => {
+                    setValue("role", "PATIENT");
+                    clearErrors();
+                  }}
                   className={`flex items-center justify-center gap-2 rounded-xl border p-3 font-heading text-sm font-semibold transition-all ${
                     selectedRole === "PATIENT"
                       ? "border-primary bg-primary/10 text-primary shadow-sm"
@@ -239,7 +467,11 @@ export default function RegisterPage() {
                   <p className="text-xs text-destructive">
                     {errors.password.message}
                   </p>
-                ) : null}
+                ) : (
+                  <p className="text-[11px] text-muted-foreground">
+                    Must include uppercase, lowercase, number & symbol
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
