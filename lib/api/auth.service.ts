@@ -112,6 +112,20 @@ export const authService = {
     await api.post<null>("/auth/register", payload);
   },
 
+  verifyEmail: async (payload: {
+    email: string;
+    otp: string;
+  }): Promise<ILoginResponseData> => {
+    const res = await api.post<ILoginResponseData>("/auth/verify-email", payload);
+    if (res.data?.accessToken) {
+      authService.setTokens(res.data.accessToken, res.data.refreshToken);
+      if (res.data?.user) {
+        authService.setUser(res.data.user);
+      }
+    }
+    return res.data;
+  },
+
   getMe: async (): Promise<IUser> => {
     const res = await api.get<IUser>("/auth/me");
     return res.data;
