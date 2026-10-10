@@ -53,7 +53,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
   {
     role: "DONOR",
     title: "Voluntary Donor",
-    badge: "O+ Available",
+    badge: "AB+ Available",
     email: "arikkakhan@gmail.com",
     pass: "Donor@1234567",
     icon: Heart,
