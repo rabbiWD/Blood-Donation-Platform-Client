@@ -130,8 +130,8 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Standard Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Standard Login Form with autoComplete="off" */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <div className="relative">
@@ -139,9 +139,9 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
+                  autoComplete="off"
                   placeholder="name@example.com"
                   className="pl-9"
-                  autoComplete="off"
                   disabled={isAnyLoading}
                   {...register("email")}
                 />
@@ -168,9 +168,9 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   className="pl-9 pr-9"
-                  autoComplete="new-password"
                   disabled={isAnyLoading}
                   {...register("password")}
                 />
@@ -277,7 +277,6 @@ export default function LoginPage() {
                 );
               })}
             </div>
-
           </div>
         </CardContent>
 
