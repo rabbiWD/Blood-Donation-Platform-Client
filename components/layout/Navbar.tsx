@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/layout/Logo";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +27,10 @@ import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { user, role, isAuthenticated, logout } = useAuth();
+  const { user, role, isAuthenticated: authed, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isAuthenticated = mounted && authed;
 
   const profileHref =
     role === "DONOR"
