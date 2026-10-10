@@ -12,7 +12,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
@@ -76,11 +76,13 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loadingRole, setLoadingRole] = useState<string | null>(null);
+  // Inputs stay read-only until focused so browsers can't autofill saved credentials
+  const [unlocked, setUnlocked] = useState(false);
 
   const {
     register,
     handleSubmit,
-    setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -89,6 +91,11 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    reset({ email: "", password: "" });
+    setUnlocked(false);
+  }, [reset]);
 
   const onSubmit = async (data: LoginInput) => {
     try {
@@ -100,8 +107,6 @@ export default function LoginPage() {
 
   const handleDemoLogin = async (account: DemoAccount) => {
     setLoadingRole(account.role);
-    setValue("email", account.email);
-    setValue("password", account.pass);
 
     try {
       await login({
@@ -140,6 +145,8 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   autoComplete="off"
+                  readOnly={!unlocked}
+                  onFocus={() => setUnlocked(true)}
                   placeholder="name@example.com"
                   className="pl-9"
                   disabled={isAnyLoading}
@@ -169,6 +176,8 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
+                  readOnly={!unlocked}
+                  onFocus={() => setUnlocked(true)}
                   placeholder="••••••••"
                   className="pl-9 pr-9"
                   disabled={isAnyLoading}

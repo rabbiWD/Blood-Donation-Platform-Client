@@ -81,8 +81,8 @@ export function useAuth() {
     dispatch(clearSession());
     queryClient.clear();
     toast.info("Logged out successfully");
-    router.push("/login");
-  }, [dispatch, queryClient, router]);
+    window.location.href = "/login";
+  }, [dispatch, queryClient]);
 
   const googleLogin = useCallback(
     async (payload: { idToken: string; role?: "DONOR" | "PATIENT" }) => {
