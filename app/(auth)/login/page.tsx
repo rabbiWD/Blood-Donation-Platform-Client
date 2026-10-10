@@ -54,8 +54,8 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     role: "DONOR",
     title: "Voluntary Donor",
     badge: "O+ Available",
-    email: "donor@blooddonation.com",
-    pass: "Donor@123456",
+    email: "arikkakhan@gmail.com",
+    pass: "Donor@1234567",
     icon: Heart,
     colorClass:
       "hover:border-red-500/50 hover:bg-red-50/50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400",
