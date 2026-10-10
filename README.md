@@ -4,7 +4,7 @@
 
 ---
 
-## 🌟 Highlights & Key Capabilities
+##  Highlights & Key Capabilities
 
 - **1-Click Instant Demo Authentication**: Dedicated one-click login cards for immediate evaluator grading across all 3 roles (**Admin**, **Donor**, **Patient**).
 - **18+ Fully Functional App Router Routes**: Zero placeholder text or mock routes. Complete end-to-end integration with the Express 5 + Prisma backend (`http://localhost:5000/api/v1`).
@@ -15,7 +15,7 @@
 
 ---
 
-## 🔑 Demo Access Credentials (1-Click Login Ready)
+##  Demo Access Credentials (1-Click Login Ready)
 
 Access the dedicated demo section on `/login` to sign in instantly with one click, or enter credentials manually:
 
@@ -27,7 +27,7 @@ Access the dedicated demo section on `/login` to sign in instantly with one clic
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 | Domain | Technology |
 |---|---|
@@ -43,7 +43,7 @@ Access the dedicated demo section on `/login` to sign in instantly with one clic
 
 ---
 
-## 🗺️ Application Page Inventory (23 Prerendered Routes)
+##  Application Page Inventory (23 Prerendered Routes)
 
 ### 1. Public & Marketing Pages
 - `/` — Homepage featuring emergency ticker, impact counters, compatibility guide, and testimonials.
@@ -78,7 +78,7 @@ Access the dedicated demo section on `/login` to sign in instantly with one clic
 
 ---
 
-## ⚙️ Environment Variables Setup
+##  Environment Variables Setup
 
 Create a `.env.local` file in the `blood-donation-client` root directory:
 
@@ -92,7 +92,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ---
 
-## 🚀 Running Locally
+##  Running Locally
 
 ```bash
 # 1. Install dependencies
@@ -113,7 +113,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📜 Git Commit Protocol
+##  Git Commit Protocol
 
 This repository adheres strictly to Conventional Commits:
 - `feat:` for new features and components

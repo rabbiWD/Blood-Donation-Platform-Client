@@ -70,9 +70,7 @@ export function GoogleLoginButton({ disabled }: GoogleLoginButtonProps) {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const googleBtnContainerRef = useRef<HTMLDivElement>(null);
 
-  const clientId =
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-    "1053858348449-nd7df2itmap04f09qa5j0j1h4o3qmk9b.apps.googleusercontent.com";
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   const handleCredentialResponse = useCallback(
     async (response: { credential?: string }) => {
