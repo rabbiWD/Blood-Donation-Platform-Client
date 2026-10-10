@@ -12,7 +12,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,8 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -88,6 +90,13 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  // Reset form state on load so email/password from a previous session never show
+  useEffect(() => {
+    reset({ email: "", password: "" });
+    setShowPassword(false);
+    setLoadingRole(null);
+  }, [reset]);
 
   const onSubmit = async (data: LoginInput) => {
     try {
@@ -99,6 +108,8 @@ export default function LoginPage() {
 
   const handleDemoLogin = async (account: DemoAccount) => {
     setLoadingRole(account.role);
+    setValue("email", account.email);
+    setValue("password", account.pass);
 
     try {
       await login({
@@ -138,7 +149,6 @@ export default function LoginPage() {
                   type="email"
                   placeholder="name@example.com"
                   className="pl-9"
-                  autoComplete="off"
                   disabled={isAnyLoading}
                   {...register("email")}
                 />
@@ -167,7 +177,6 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="pl-9 pr-9"
-                  autoComplete="new-password"
                   disabled={isAnyLoading}
                   {...register("password")}
                 />
