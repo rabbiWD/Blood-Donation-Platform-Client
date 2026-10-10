@@ -12,7 +12,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,6 @@ export default function LoginPage() {
     register,
     handleSubmit,
     setValue,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -90,13 +89,6 @@ export default function LoginPage() {
       password: "",
     },
   });
-
-  // Reset form state on load so email/password from a previous session never show
-  useEffect(() => {
-    reset({ email: "", password: "" });
-    setShowPassword(false);
-    setLoadingRole(null);
-  }, [reset]);
 
   const onSubmit = async (data: LoginInput) => {
     try {
@@ -130,7 +122,7 @@ export default function LoginPage() {
       <Card className="border shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="font-heading text-2xl font-bold tracking-tight">
-            Welcome Back 👋
+            Welcome Back
           </CardTitle>
           <CardDescription>
             Enter your credentials to access your LifeLink account
@@ -149,6 +141,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="name@example.com"
                   className="pl-9"
+                  autoComplete="off"
                   disabled={isAnyLoading}
                   {...register("email")}
                 />
@@ -177,6 +170,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="pl-9 pr-9"
+                  autoComplete="new-password"
                   disabled={isAnyLoading}
                   {...register("password")}
                 />
