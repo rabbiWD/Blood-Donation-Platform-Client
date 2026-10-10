@@ -12,7 +12,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
@@ -80,7 +80,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -89,6 +89,12 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  // Clear any leftover credentials/errors (e.g. after logout or cached navigation)
+  useEffect(() => {
+    reset({ email: "", password: "" });
+    setShowPassword(false);
+  }, [reset]);
 
   const onSubmit = async (data: LoginInput) => {
     try {
@@ -100,8 +106,6 @@ export default function LoginPage() {
 
   const handleDemoLogin = async (account: DemoAccount) => {
     setLoadingRole(account.role);
-    setValue("email", account.email);
-    setValue("password", account.pass);
 
     try {
       await login({
