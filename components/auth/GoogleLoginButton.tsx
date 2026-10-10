@@ -36,6 +36,11 @@ declare global {
   }
 }
 
+// GSI must be initialized only once per page load; track it at module level.
+let gsiInitializedFor: string | null = null;
+let gsiCredentialHandler: ((response: { credential?: string }) => void) | null =
+  null;
+
 function GoogleIcon({ className = "size-4" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
@@ -101,12 +106,18 @@ export function GoogleLoginButton({ disabled }: GoogleLoginButtonProps) {
     }
 
     try {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
+      // Always point the shared callback at the latest handler
+      gsiCredentialHandler = handleCredentialResponse;
+
+      if (gsiInitializedFor !== clientId) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response) => gsiCredentialHandler?.(response),
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+        gsiInitializedFor = clientId;
+      }
 
       // Clear any prior children before re-rendering
       googleBtnContainerRef.current.innerHTML = "";
